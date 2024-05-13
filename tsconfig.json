@@ -13,6 +13,7 @@
     "outDir": "lib",
     "inlineSources": false,
     "noImplicitAny": true,
+    
 
     "typeRoots": [
       "./node_modules/@types",
@@ -32,6 +33,8 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.tsx"
+    "src/**/*.tsx",
+    "src/**/*.png" // Inclure également les fichiers PNG dans la compilation
+
   ]
 }
