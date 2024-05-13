@@ -1,13 +1,23 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { IFormProps, IFormData } from './IFormProps';
 
 export const Forme: React.FC<IFormProps> = ({ context }) => {
-  const [formEntries, setFormEntries] = React.useState<IFormData[]>([]);
+  const [formEntries, setFormEntries] = useState<IFormData[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchFormData();
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex(prevIndex => (prevIndex + 3 < formEntries.length ? prevIndex + 3 : 0));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [formEntries]);
 
   const fetchFormData = async () => {
     try {
@@ -28,16 +38,14 @@ export const Forme: React.FC<IFormProps> = ({ context }) => {
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
 
-      // Récupérer les données brutes de la feuille Excel
       const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: true });
 
-      // Traitement des dates manuellement et conversion explicite du type
       const formData: IFormData[] = rawData
         .slice(1)
         .map((row: any) => ({
           Nom: row[0],
           Prenom: row[1],
-          Birthday: parseDate(row[2]) as Date, // Conversion explicite du type en Date
+          Birthday: parseDate(row[2]) as Date,
         }));
 
       return formData;
@@ -47,47 +55,37 @@ export const Forme: React.FC<IFormProps> = ({ context }) => {
     }
   };
 
-  // Fonction pour analyser les dates
   const parseDate = (dateString: any): Date | string => {
-    if (!dateString) return ''; // Gestion des cellules vides
+    if (!dateString) return '';
 
-    // Vérifier si la valeur est une date brute (nombre) ou une date en texte
     if (typeof dateString === 'number') {
-      return new Date((dateString - (25567 + 1)) * 86400 * 1000); // Conversion du nombre en date
+      return new Date((dateString - (25567 + 1)) * 86400 * 1000);
     } else if (typeof dateString === 'string') {
-      return new Date(dateString); // La valeur est déjà une chaîne de caractères représentant une date
+      return new Date(dateString);
     } else {
-      return dateString; // Retourner la valeur telle quelle
+      return dateString;
     }
   };
 
-  // Fonction pour vérifier si une date est aujourd'hui
   const isToday = (someDate: Date): boolean => {
     const today = new Date();
     return someDate.getDate() === today.getDate() &&
-           someDate.getMonth() === today.getMonth();
+      someDate.getMonth() === today.getMonth();
   };
 
   return (
     <div>
-      <table>
-        <thead>
-          <tr>
-            <th>Nom</th>
-            <th>Prénom</th>
-            <th>Birthday</th>
-          </tr>
-        </thead>
-        <tbody>
-          {formEntries.map((entry, index) => (
-            <tr key={index}>
-              <td>{entry.Nom}</td>
-              <td>{entry.Prenom}</td>
-              <td>{entry.Birthday.toLocaleDateString()}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <h1 style={{ marginLeft: '10px', fontSize: '24px', fontWeight: 'bold', color: 'blue' }}>Birthday</h1>
+      </div>
+      {formEntries.slice(currentIndex, currentIndex + 3).map((entry, index) => (
+        <div key={index} style={{ display: 'flex', marginBottom: '10px' }}>
+          <div style={{ minWidth: '300px', border: '1px solid #ccc', borderRadius: '5px', padding: '10px', marginRight: '10px', backgroundColor: 'transparent' }}>
+            <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '5px' }}>{entry.Nom} {entry.Prenom}</div>
+            <div style={{ fontSize: '16px' }}>We wish you all a happy birthday!</div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 };

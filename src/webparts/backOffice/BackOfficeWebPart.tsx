@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { BrowserRouter as Router} from 'react-router-dom'; // Import BrowserRouter and Route
+import { BrowserRouter as Router} from 'react-router-dom'; 
 import { Version } from '@microsoft/sp-core-library';
 import {
   BaseClientSideWebPart,
@@ -20,7 +20,6 @@ import Forme from './components/Forme/Forme';
 
 export default class CareerPageWebPart extends BaseClientSideWebPart<{}> {
 
-  // Define a state to track whether the initial load has occurred
   state = {
     initialLoad: true,
   };
@@ -28,7 +27,6 @@ export default class CareerPageWebPart extends BaseClientSideWebPart<{}> {
 
   protected onInit(): Promise<void> {
     return super.onInit().then(_ => {
-      // other init code may be present
       sp.setup({
         spfxContext: this.context as any
       });
@@ -39,7 +37,7 @@ export default class CareerPageWebPart extends BaseClientSideWebPart<{}> {
     
 
     const element: React.ReactElement<{}> = (
-      <Router> {/* Wrap your components with Router */}
+      <Router> 
         <React.Fragment>
 
            <Forme context={this.context} />
